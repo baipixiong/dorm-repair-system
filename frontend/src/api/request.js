@@ -32,8 +32,9 @@ service.interceptors.response.use(
     const message = error.response?.data?.message || '网络异常，请稍后重试'
     if (status === 401) {
       userStore.clear()
-      if (router.currentRoute.value.path !== '/login') {
-        router.push('/login')
+      const path = router.currentRoute.value.path
+      if (path !== '/login' && path !== '/register') {
+        router.push({ path: '/login', query: { redirect: router.currentRoute.value.fullPath } })
       }
     }
     ElMessage.error(message)

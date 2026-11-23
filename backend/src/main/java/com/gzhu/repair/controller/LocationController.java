@@ -29,7 +29,6 @@ public class LocationController {
 
     @GetMapping("/locations")
     public Result<List<Building>> locations() {
-        UserContext.require();
         return Result.success(locationService.buildings());
     }
 
