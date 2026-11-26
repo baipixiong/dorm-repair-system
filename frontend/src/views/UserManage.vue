@@ -49,7 +49,7 @@
         <el-table-column prop="phone" label="手机号" width="130" />
         <el-table-column label="所属宿舍" min-width="140">
           <template #default="{ row }">
-            <span v-if="row.buildingName">{{ row.buildingName }} {{ row.roomName || '' }}</span>
+            <span v-if="row.buildingName">{{ row.buildingName }} {{ row.roomNo || '' }}</span>
             <span v-else class="text-muted">-</span>
           </template>
         </el-table-column>
@@ -119,14 +119,12 @@
         </el-form-item>
         <div v-if="form.role === 'student'" class="form-row">
           <el-form-item label="所在楼栋">
-            <el-select v-model="form.buildingId" style="width: 100%" @change="form.roomId = null">
+            <el-select v-model="form.buildingId" style="width: 100%" @change="form.roomNo = ''">
               <el-option v-for="b in buildings" :key="b.id" :label="b.name" :value="b.id" />
             </el-select>
           </el-form-item>
-          <el-form-item label="宿舍房间">
-            <el-select v-model="form.roomId" style="width: 100%" :disabled="!form.buildingId">
-              <el-option v-for="r in rooms" :key="r.id" :label="r.roomNo" :value="r.id" />
-            </el-select>
+          <el-form-item label="宿舍房间号">
+            <el-input v-model="form.roomNo" placeholder="请输入房间号" :disabled="!form.buildingId" maxlength="30" />
           </el-form-item>
         </div>
       </el-form>
@@ -139,7 +137,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { Plus, Search, RefreshLeft } from '@element-plus/icons-vue'
 import { getUsers, createUser, updateUserStatus } from '../api/user'
@@ -166,12 +164,7 @@ const form = reactive({
   phone: '',
   email: '',
   buildingId: null,
-  roomId: null
-})
-
-const rooms = computed(() => {
-  const building = buildings.value.find((item) => item.id === form.buildingId)
-  return building?.rooms || []
+  roomNo: ''
 })
 
 const rules = {
@@ -232,7 +225,7 @@ function openCreate() {
     phone: '',
     email: '',
     buildingId: null,
-    roomId: null
+    roomNo: ''
   })
   dialogVisible.value = true
 }
@@ -240,7 +233,7 @@ function openCreate() {
 function onRoleChange() {
   if (form.role !== 'student') {
     form.buildingId = null
-    form.roomId = null
+    form.roomNo = ''
   }
 }
 

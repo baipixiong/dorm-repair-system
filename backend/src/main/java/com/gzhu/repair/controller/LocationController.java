@@ -3,9 +3,7 @@ package com.gzhu.repair.controller;
 import com.gzhu.repair.common.BusinessException;
 import com.gzhu.repair.common.Result;
 import com.gzhu.repair.dto.BuildingRequest;
-import com.gzhu.repair.dto.RoomRequest;
 import com.gzhu.repair.entity.Building;
-import com.gzhu.repair.entity.Room;
 import com.gzhu.repair.security.UserContext;
 import com.gzhu.repair.service.LocationService;
 import jakarta.validation.Valid;
@@ -35,11 +33,6 @@ public class LocationController {
     @PostMapping("/admin/locations/buildings")
     public Result<Building> addBuilding(@Valid @RequestBody BuildingRequest request) {
         return Result.success(locationService.addBuilding(request));
-    }
-
-    @PostMapping("/admin/locations/rooms")
-    public Result<Room> addRoom(@Valid @RequestBody RoomRequest request) {
-        return Result.success(locationService.addRoom(request));
     }
 
     @GetMapping("/admin/locations/check")

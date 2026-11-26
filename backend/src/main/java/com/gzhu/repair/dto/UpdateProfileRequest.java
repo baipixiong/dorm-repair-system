@@ -17,7 +17,7 @@ public class UpdateProfileRequest {
 
     private Long buildingId;
 
-    private Long roomId;
+    private String roomNo;
 
     public String getRealName() {
         return realName;
@@ -59,11 +59,11 @@ public class UpdateProfileRequest {
         this.buildingId = buildingId;
     }
 
-    public Long getRoomId() {
-        return roomId;
+    public String getRoomNo() {
+        return roomNo;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setRoomNo(String roomNo) {
+        this.roomNo = roomNo;
     }
 }

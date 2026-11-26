@@ -49,8 +49,8 @@ public class User {
     @Column(name = "building_id")
     private Long buildingId;
 
-    @Column(name = "room_id")
-    private Long roomId;
+    @Column(name = "room_no", length = 30)
+    private String roomNo;
 
     private Integer status;
 
@@ -64,9 +64,6 @@ public class User {
 
     @Transient
     private String buildingName;
-
-    @Transient
-    private String roomName;
 
     @Transient
     private String roleLabel;
@@ -172,12 +169,12 @@ public class User {
         this.buildingId = buildingId;
     }
 
-    public Long getRoomId() {
-        return roomId;
+    public String getRoomNo() {
+        return roomNo;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setRoomNo(String roomNo) {
+        this.roomNo = roomNo;
     }
 
     public Integer getStatus() {
@@ -210,14 +207,6 @@ public class User {
 
     public void setBuildingName(String buildingName) {
         this.buildingName = buildingName;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
     }
 
     public String getRoleLabel() {

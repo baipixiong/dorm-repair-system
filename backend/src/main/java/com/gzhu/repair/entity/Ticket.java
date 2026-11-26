@@ -32,8 +32,8 @@ public class Ticket {
     @Column(name = "building_id", nullable = false)
     private Long buildingId;
 
-    @Column(name = "room_id", nullable = false)
-    private Long roomId;
+    @Column(name = "room_no", nullable = false, length = 30)
+    private String roomNo;
 
     @Column(nullable = false, length = 100)
     private String title;
@@ -91,9 +91,6 @@ public class Ticket {
 
     @Transient
     private String buildingName;
-
-    @Transient
-    private String roomName;
 
     @Transient
     private String assigneeName;
@@ -166,12 +163,12 @@ public class Ticket {
         this.buildingId = buildingId;
     }
 
-    public Long getRoomId() {
-        return roomId;
+    public String getRoomNo() {
+        return roomNo;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setRoomNo(String roomNo) {
+        this.roomNo = roomNo;
     }
 
     public String getTitle() {
@@ -308,14 +305,6 @@ public class Ticket {
 
     public void setBuildingName(String buildingName) {
         this.buildingName = buildingName;
-    }
-
-    public String getRoomName() {
-        return roomName;
-    }
-
-    public void setRoomName(String roomName) {
-        this.roomName = roomName;
     }
 
     public String getAssigneeName() {

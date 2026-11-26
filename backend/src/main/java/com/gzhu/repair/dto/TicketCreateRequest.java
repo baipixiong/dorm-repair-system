@@ -18,8 +18,12 @@ public class TicketCreateRequest {
 
     private String priority;
 
-    @NotNull(message = "请选择报修房间")
-    private Long roomId;
+    @NotNull(message = "请选择报修楼栋")
+    private Long buildingId;
+
+    @NotBlank(message = "请输入房间号")
+    @Size(max = 30, message = "房间号不能超过 30 个字符")
+    private String roomNo;
 
     private String contactPhone;
 
@@ -55,12 +59,20 @@ public class TicketCreateRequest {
         this.priority = priority;
     }
 
-    public Long getRoomId() {
-        return roomId;
+    public Long getBuildingId() {
+        return buildingId;
     }
 
-    public void setRoomId(Long roomId) {
-        this.roomId = roomId;
+    public void setBuildingId(Long buildingId) {
+        this.buildingId = buildingId;
+    }
+
+    public String getRoomNo() {
+        return roomNo;
+    }
+
+    public void setRoomNo(String roomNo) {
+        this.roomNo = roomNo;
     }
 
     public String getContactPhone() {

@@ -1,0 +1,23 @@
+[Unit]
+Description=Dorm Repair Backend (Spring Boot)
+Documentation=file:///opt/dorm-repair/README.md
+After=network-online.target mysql.service
+Wants=network-online.target mysql.service
+
+[Service]
+Type=simple
+# 建议用专用系统用户运行；如不想新建用户，可改为部署账号
+User=dormrepair
+Group=dormrepair
+WorkingDirectory=/opt/dorm-repair/backend
+Environment="TZ=Asia/Shanghai"
+# 系统存在多个 JDK 时，用下面这行显式指定 JDK17 路径（按实际调整）
+# Environment="JAVA_HOME=/usr/lib/jvm/java-17-openjdk"
+ExecStart=/usr/bin/java -jar /opt/dorm-repair/backend/target/dorm-repair-backend-1.0.0.jar
+# Spring Boot 收到 SIGTERM 正常退出码为 143，视为成功以免被 Restart 循环拉起
+SuccessExitStatus=143
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target

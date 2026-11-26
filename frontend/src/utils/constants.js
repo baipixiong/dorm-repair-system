@@ -77,6 +77,6 @@ export function roleType(role) {
 export function locationText(ticket) {
   if (!ticket) return '-'
   const building = ticket.buildingName || ''
-  const room = ticket.roomName || ''
+  const room = ticket.roomNo || ''
   return `${building} ${room}`.trim() || '-'
 }

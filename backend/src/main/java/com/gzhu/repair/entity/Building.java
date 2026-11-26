@@ -8,10 +8,8 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
-import jakarta.persistence.Transient;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Entity
 @Table(name = "building")
@@ -36,12 +34,6 @@ public class Building {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "GMT+8")
     @Column(name = "created_at")
     private LocalDateTime createdAt;
-
-    @Transient
-    private List<Room> rooms;
-
-    @Transient
-    private Long roomCount;
 
     @PrePersist
     public void prePersist() {
@@ -99,21 +91,5 @@ public class Building {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
-    }
-
-    public List<Room> getRooms() {
-        return rooms;
-    }
-
-    public void setRooms(List<Room> rooms) {
-        this.rooms = rooms;
-    }
-
-    public Long getRoomCount() {
-        return roomCount;
-    }
-
-    public void setRoomCount(Long roomCount) {
-        this.roomCount = roomCount;
     }
 }

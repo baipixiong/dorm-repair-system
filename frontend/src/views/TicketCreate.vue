@@ -34,10 +34,8 @@
                 <el-option v-for="b in buildings" :key="b.id" :label="b.name" :value="b.id" />
               </el-select>
             </el-form-item>
-            <el-form-item label="宿舍房间" prop="roomId">
-              <el-select v-model="form.roomId" placeholder="请选择房间" style="width: 100%" :disabled="!form.buildingId">
-                <el-option v-for="r in rooms" :key="r.id" :label="r.roomNo" :value="r.id" />
-              </el-select>
+            <el-form-item label="宿舍房间号" prop="roomNo">
+              <el-input v-model="form.roomNo" placeholder="请输入房间号，例如：302" :disabled="!form.buildingId" maxlength="30" />
             </el-form-item>
           </div>
 
@@ -96,7 +94,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import { Back, Plus } from '@element-plus/icons-vue'
@@ -116,26 +114,21 @@ const form = reactive({
   category: '',
   priority: 'normal',
   buildingId: null,
-  roomId: null,
+  roomNo: '',
   description: '',
   contactPhone: ''
-})
-
-const rooms = computed(() => {
-  const building = buildings.value.find((item) => item.id === form.buildingId)
-  return building?.rooms || []
 })
 
 const rules = {
   title: [{ required: true, message: '请输入报修标题', trigger: 'blur' }],
   category: [{ required: true, message: '请选择报修类别', trigger: 'change' }],
   buildingId: [{ required: true, message: '请选择楼栋', trigger: 'change' }],
-  roomId: [{ required: true, message: '请选择房间', trigger: 'change' }],
+  roomNo: [{ required: true, message: '请输入房间号', trigger: 'blur' }],
   description: [{ required: true, message: '请填写故障描述', trigger: 'blur' }]
 }
 
 function onBuildingChange() {
-  form.roomId = null
+  form.roomNo = ''
 }
 
 function handleExceed() {
@@ -148,8 +141,8 @@ async function loadLocations() {
     const me = userStore.user
     if (me?.buildingId) {
       form.buildingId = me.buildingId
-      if (me?.roomId) {
-        form.roomId = me.roomId
+      if (me?.roomNo) {
+        form.roomNo = me.roomNo
       }
     }
   } catch (e) {
@@ -167,7 +160,8 @@ async function submit() {
         title: form.title,
         category: form.category,
         priority: form.priority,
-        roomId: form.roomId,
+        buildingId: form.buildingId,
+        roomNo: form.roomNo,
         description: form.description,
         contactPhone: form.contactPhone
       })

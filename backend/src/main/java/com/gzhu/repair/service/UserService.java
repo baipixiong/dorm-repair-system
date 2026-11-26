@@ -4,11 +4,8 @@ import com.gzhu.repair.common.BusinessException;
 import com.gzhu.repair.common.Constants;
 import com.gzhu.repair.common.PageResult;
 import com.gzhu.repair.dto.CreateUserRequest;
-import com.gzhu.repair.entity.Building;
-import com.gzhu.repair.entity.Room;
 import com.gzhu.repair.entity.User;
 import com.gzhu.repair.repository.BuildingRepository;
-import com.gzhu.repair.repository.RoomRepository;
 import com.gzhu.repair.repository.UserRepository;
 import jakarta.persistence.criteria.Predicate;
 import org.springframework.data.domain.Page;
@@ -26,16 +23,13 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final BuildingRepository buildingRepository;
-    private final RoomRepository roomRepository;
     private final AuditService auditService;
 
     public UserService(UserRepository userRepository,
                        BuildingRepository buildingRepository,
-                       RoomRepository roomRepository,
                        AuditService auditService) {
         this.userRepository = userRepository;
         this.buildingRepository = buildingRepository;
-        this.roomRepository = roomRepository;
         this.auditService = auditService;
     }
 
@@ -47,10 +41,6 @@ public class UserService {
         if (user.getBuildingId() != null) {
             buildingRepository.findById(user.getBuildingId())
                     .ifPresent(b -> user.setBuildingName(b.getName()));
-        }
-        if (user.getRoomId() != null) {
-            roomRepository.findById(user.getRoomId())
-                    .ifPresent(r -> user.setRoomName(r.getRoomNo()));
         }
         return user;
     }
@@ -100,7 +90,7 @@ public class UserService {
         user.setEmail(request.getEmail());
         user.setGender(request.getGender() == null ? 0 : request.getGender());
         user.setBuildingId(request.getBuildingId());
-        user.setRoomId(request.getRoomId());
+        user.setRoomNo(request.getRoomNo());
         user.setStatus(1);
         userRepository.save(user);
         auditService.log("新增用户", "创建账号 " + user.getUsername() + "（" + user.getRealName() + "）");
@@ -130,13 +120,5 @@ public class UserService {
         List<User> list = userRepository.findByRoleAndStatusOrderByIdAsc(Constants.ROLE_TECHNICIAN, 1);
         list.forEach(this::enrich);
         return list;
-    }
-
-    public List<Building> allBuildings() {
-        return buildingRepository.findAllByOrderByIdAsc();
-    }
-
-    public List<Room> allRooms() {
-        return roomRepository.findAllByOrderByBuildingIdAscRoomNoAsc();
     }
 }

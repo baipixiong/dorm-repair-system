@@ -51,14 +51,12 @@
               </div>
               <div v-if="userStore.isStudent" class="form-row">
                 <el-form-item label="所在楼栋">
-                  <el-select v-model="profileForm.buildingId" style="width: 100%" @change="profileForm.roomId = null">
+                  <el-select v-model="profileForm.buildingId" style="width: 100%" @change="profileForm.roomNo = ''">
                     <el-option v-for="b in buildings" :key="b.id" :label="b.name" :value="b.id" />
                   </el-select>
                 </el-form-item>
-                <el-form-item label="宿舍房间">
-                  <el-select v-model="profileForm.roomId" style="width: 100%" :disabled="!profileForm.buildingId">
-                    <el-option v-for="r in profileRooms" :key="r.id" :label="r.roomNo" :value="r.id" />
-                  </el-select>
+                <el-form-item label="宿舍房间号">
+                  <el-input v-model="profileForm.roomNo" placeholder="请输入房间号" :disabled="!profileForm.buildingId" maxlength="30" />
                 </el-form-item>
               </div>
               <el-button type="primary" :loading="saving" @click="saveProfile">保存资料</el-button>
@@ -104,8 +102,8 @@ const me = computed(() => userStore.user || {})
 const initials = computed(() => (userStore.displayName || 'U').slice(0, 1))
 const dormText = computed(() => {
   const user = me.value
-  if (!user.buildingName && !user.roomName) return '-'
-  return `${user.buildingName || ''} ${user.roomName || ''}`.trim()
+  if (!user.buildingName && !user.roomNo) return '-'
+  return `${user.buildingName || ''} ${user.roomNo || ''}`.trim()
 })
 
 const profileForm = reactive({
@@ -114,18 +112,13 @@ const profileForm = reactive({
   email: '',
   gender: 0,
   buildingId: null,
-  roomId: null
+  roomNo: ''
 })
 
 const passwordForm = reactive({
   oldPassword: '',
   newPassword: '',
   confirmPassword: ''
-})
-
-const profileRooms = computed(() => {
-  const building = buildings.value.find((item) => item.id === profileForm.buildingId)
-  return building?.rooms || []
 })
 
 const profileRules = {
@@ -159,7 +152,7 @@ function fillProfile() {
   profileForm.email = user.email || ''
   profileForm.gender = user.gender ?? 0
   profileForm.buildingId = user.buildingId || null
-  profileForm.roomId = user.roomId || null
+  profileForm.roomNo = user.roomNo || ''
 }
 
 async function loadLocations() {
@@ -182,7 +175,7 @@ async function saveProfile() {
         email: profileForm.email,
         gender: profileForm.gender,
         buildingId: profileForm.buildingId,
-        roomId: profileForm.roomId
+        roomNo: profileForm.roomNo
       })
       userStore.setUser(user)
       ElMessage.success('资料保存成功')

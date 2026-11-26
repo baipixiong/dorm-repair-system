@@ -40,10 +40,8 @@
             <el-option v-for="b in buildings" :key="b.id" :label="b.name" :value="b.id" />
           </el-select>
         </el-form-item>
-        <el-form-item label="宿舍房间" prop="roomId">
-          <el-select v-model="form.roomId" placeholder="请选择房间" style="width: 100%" :disabled="!form.buildingId">
-            <el-option v-for="r in rooms" :key="r.id" :label="r.roomNo" :value="r.id" />
-          </el-select>
+        <el-form-item label="宿舍房间号" prop="roomNo">
+          <el-input v-model="form.roomNo" placeholder="请输入房间号，例如：302" :disabled="!form.buildingId" maxlength="30" />
         </el-form-item>
       </div>
 
@@ -64,7 +62,7 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive, ref } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
 import AuthLayout from '../components/AuthLayout.vue'
@@ -86,12 +84,7 @@ const form = reactive({
   phone: '',
   email: '',
   buildingId: null,
-  roomId: null
-})
-
-const rooms = computed(() => {
-  const building = buildings.value.find((item) => item.id === form.buildingId)
-  return building?.rooms || []
+  roomNo: ''
 })
 
 const validateConfirm = (rule, value, callback) => {
@@ -119,7 +112,7 @@ const rules = {
 }
 
 function onBuildingChange() {
-  form.roomId = null
+  form.roomNo = ''
 }
 
 async function loadLocations() {
@@ -144,7 +137,7 @@ async function submit() {
         phone: form.phone,
         email: form.email,
         buildingId: form.buildingId,
-        roomId: form.roomId
+        roomNo: form.roomNo
       })
       userStore.setLogin(data)
       ElMessage.success('注册成功，已自动登录')

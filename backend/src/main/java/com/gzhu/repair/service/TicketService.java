@@ -9,14 +9,12 @@ import com.gzhu.repair.dto.TicketCreateRequest;
 import com.gzhu.repair.entity.Attachment;
 import com.gzhu.repair.entity.Building;
 import com.gzhu.repair.entity.Evaluation;
-import com.gzhu.repair.entity.Room;
 import com.gzhu.repair.entity.Ticket;
 import com.gzhu.repair.entity.TicketEvent;
 import com.gzhu.repair.entity.User;
 import com.gzhu.repair.repository.AttachmentRepository;
 import com.gzhu.repair.repository.BuildingRepository;
 import com.gzhu.repair.repository.EvaluationRepository;
-import com.gzhu.repair.repository.RoomRepository;
 import com.gzhu.repair.repository.TicketEventRepository;
 import com.gzhu.repair.repository.TicketRepository;
 import com.gzhu.repair.repository.UserRepository;
@@ -53,7 +51,6 @@ public class TicketService {
     private final AttachmentRepository attachmentRepository;
     private final EvaluationRepository evaluationRepository;
     private final UserRepository userRepository;
-    private final RoomRepository roomRepository;
     private final BuildingRepository buildingRepository;
     private final FileStorageService fileStorageService;
     private final AuditService auditService;
@@ -63,7 +60,6 @@ public class TicketService {
                          AttachmentRepository attachmentRepository,
                          EvaluationRepository evaluationRepository,
                          UserRepository userRepository,
-                         RoomRepository roomRepository,
                          BuildingRepository buildingRepository,
                          FileStorageService fileStorageService,
                          AuditService auditService) {
@@ -72,7 +68,6 @@ public class TicketService {
         this.attachmentRepository = attachmentRepository;
         this.evaluationRepository = evaluationRepository;
         this.userRepository = userRepository;
-        this.roomRepository = roomRepository;
         this.buildingRepository = buildingRepository;
         this.fileStorageService = fileStorageService;
         this.auditService = auditService;
@@ -88,14 +83,18 @@ public class TicketService {
         String priority = request.getPriority() == null || request.getPriority().isBlank()
                 ? Constants.PRIORITY_NORMAL : request.getPriority();
         validatePriority(priority);
-        Room room = roomRepository.findById(request.getRoomId())
-                .orElseThrow(() -> BusinessException.badRequest("报修房间不存在"));
+        Building building = buildingRepository.findById(request.getBuildingId())
+                .orElseThrow(() -> BusinessException.badRequest("报修楼栋不存在"));
+        String roomNo = request.getRoomNo() == null ? "" : request.getRoomNo().trim();
+        if (roomNo.isEmpty()) {
+            throw BusinessException.badRequest("请输入房间号");
+        }
 
         Ticket ticket = new Ticket();
         ticket.setTicketNo(nextTicketNo());
         ticket.setStudentId(user.getId());
-        ticket.setBuildingId(room.getBuildingId());
-        ticket.setRoomId(room.getId());
+        ticket.setBuildingId(building.getId());
+        ticket.setRoomNo(roomNo);
         ticket.setTitle(request.getTitle().trim());
         ticket.setDescription(request.getDescription().trim());
         ticket.setCategory(request.getCategory());
@@ -341,7 +340,7 @@ public class TicketService {
                     .append(csv(ticket.getStatusLabel())).append(',')
                     .append(csv(ticket.getPriorityLabel())).append(',')
                     .append(csv(ticket.getBuildingName())).append(',')
-                    .append(csv(ticket.getRoomName())).append(',')
+                    .append(csv(ticket.getRoomNo())).append(',')
                     .append(csv(ticket.getStudentName())).append(',')
                     .append(csv(ticket.getContactPhone())).append(',')
                     .append(csv(ticket.getAssigneeName())).append(',')
@@ -412,7 +411,6 @@ public class TicketService {
             return;
         }
         Set<Long> userIds = new HashSet<>();
-        Set<Long> roomIds = new HashSet<>();
         Set<Long> buildingIds = new HashSet<>();
         for (Ticket ticket : tickets) {
             if (ticket.getStudentId() != null) {
@@ -421,17 +419,12 @@ public class TicketService {
             if (ticket.getAssigneeId() != null) {
                 userIds.add(ticket.getAssigneeId());
             }
-            if (ticket.getRoomId() != null) {
-                roomIds.add(ticket.getRoomId());
-            }
             if (ticket.getBuildingId() != null) {
                 buildingIds.add(ticket.getBuildingId());
             }
         }
         Map<Long, User> users = userRepository.findAllById(userIds).stream()
                 .collect(Collectors.toMap(User::getId, u -> u));
-        Map<Long, Room> rooms = roomRepository.findAllById(roomIds).stream()
-                .collect(Collectors.toMap(Room::getId, r -> r));
         Map<Long, Building> buildings = buildingRepository.findAllById(buildingIds).stream()
                 .collect(Collectors.toMap(Building::getId, b -> b));
 
@@ -446,10 +439,6 @@ public class TicketService {
             if (assignee != null) {
                 ticket.setAssigneeName(assignee.getRealName());
                 ticket.setAssigneePhone(assignee.getPhone());
-            }
-            Room room = rooms.get(ticket.getRoomId());
-            if (room != null) {
-                ticket.setRoomName(room.getRoomNo());
             }
             Building building = buildings.get(ticket.getBuildingId());
             if (building != null) {
